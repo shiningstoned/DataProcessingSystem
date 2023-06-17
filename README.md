@@ -61,6 +61,36 @@
     ├── main.go
 ```
 # 代码实现
+## 文件切分
+```
+        file, err := h.client.Open(filename)
+	
+	defer file.Close()
+
+	var res [][]string
+	var chunk []string
+	var count = 0
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if count < 10000 {
+			chunk = append(chunk, line)
+			count++
+		} else {
+			res = append(res, chunk)
+			chunk = chunk[:0]
+		}
+	}
+
+	if err = scanner.Err(); err != nil {
+		hlog.Error("read file failed")
+		return nil, err
+	}
+
+	return res, nil
+```
 ## 文件上传
 ```
 	fileHeader, err := c.FormFile("file")
