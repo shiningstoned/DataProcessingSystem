@@ -41,8 +41,8 @@
 │   │   └── registry.go
 │   ├── main.go
 │   ├── pkg
-│   │   ├── hdfs.go
-│   │   └── mapreduce.go
+│       ├── hdfs.go
+│       └── mapreduce.go
 ├── idl
 │   ├── api.thrift
 │   ├── file.thrift
@@ -61,6 +61,18 @@
     ├── main.go
 ```
 # 代码实现
+## 文件上传
+```
+	fileHeader, err := c.FormFile("file")
+	src, err := fileHeader.Open()
+	defer src.Close()
+	client, err := hdfs.New("192.168.254.128:9000")
+	dst, err := client.Create("/user/" + username.(string) + fileHeader.Filename)
+	defer dst.Close()
+
+	_, err = io.Copy(dst, src)
+	}
+```
 ## 文件切分
 ```
         file, err := h.client.Open(filename)
@@ -90,18 +102,6 @@
 	}
 
 	return res, nil
-```
-## 文件上传
-```
-	fileHeader, err := c.FormFile("file")
-	src, err := fileHeader.Open()
-	defer src.Close()
-	client, err := hdfs.New("192.168.254.128:9000")
-	dst, err := client.Create("/user/" + username.(string) + fileHeader.Filename)
-	defer dst.Close()
-
-	_, err = io.Copy(dst, src)
-	}
 ```
 ## 数据去重
 ```
