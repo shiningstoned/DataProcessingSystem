@@ -114,7 +114,7 @@
 
 	var lock sync.Mutex
 	var wg sync.WaitGroup
-	var result map[string]int
+	var result = make(map[string]int, 0)
 	for _, data := range datas {
 	wg.Add(1)
 		go func() {
@@ -145,7 +145,7 @@
 ``` 
   datas, err := s.HDFS.PrePare(req.Filename)
 
-	var intermediate map[string][]string
+	var intermediate = make(map[string][]string, 0)
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 
