@@ -67,7 +67,7 @@
 	src, err := fileHeader.Open()
 	defer src.Close()
 	client, err := hdfs.New("192.168.254.128:9000")
-	dst, err := client.Create("/user/" + username.(string) + fileHeader.Filename)
+	dst, err := client.Create("/user/" + username.(string) + "/" + fileHeader.Filename)
 	defer dst.Close()
 
 	_, err = io.Copy(dst, src)
@@ -93,7 +93,12 @@
 		} else {
 			res = append(res, chunk)
 			chunk = chunk[:0]
+			count = 0
 		}
+	}
+
+	if len(chunk) != 0 {
+		res = append(res, chunk)
 	}
 
 	if err = scanner.Err(); err != nil {
@@ -108,12 +113,12 @@
   datas, err := s.HDFS.PrePare(req.Filename)
 
 	var lock sync.Mutex
-  var wg sync.WaitGroup
+	var wg sync.WaitGroup
 	var result map[string]int
 	for _, data := range datas {
-    wg.Add(1)
+	wg.Add(1)
 		go func() {
-      defer wg.Done()
+			defer wg.Done()
 			values := s.MapReduce.Map(data)
 			for _, value := range values {
 				lock.Lock()
@@ -126,7 +131,7 @@
 			}
 		}()
 	}
-  wg.Wait()
+	wg.Wait()
 	var res []byte
 	for key := range result {
 		keyByte := []byte(key)
